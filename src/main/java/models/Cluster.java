@@ -34,11 +34,11 @@ public class Cluster {
     }
 
     //BloomFilter
-    boolean bloomPut(String labelCode) {
+    public boolean bloomPut(String labelCode) {
         bloom.put(labelCode);
         return true;
     }
-    boolean bloomContains(String labelCode) {
+    public boolean bloomContains(String labelCode) {
         return bloom.mightContain(labelCode);
     }
 }

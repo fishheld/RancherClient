@@ -3,11 +3,10 @@ package models;
 import java.util.Map;
 
 public class Pod {
-    String name;
-    String image;
-    Map<String, String> labels;
-    String labelCode;
-
-
+    public String name;
+    public String image;
+    public Map<String, String> labels;
+    public String labelCode;
+    public String nodeName;
 
 }

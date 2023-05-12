@@ -3,9 +3,11 @@ package models;
 import java.util.List;
 
 public class Deployment {
-    String name;
-    String namespaceId;
-    String projectId;
-    List<Pod> containers;
+    public String name;
+    public String namespaceId;
+    public String projectId;
+    public List<Pod> containers;
+
+
 
 }

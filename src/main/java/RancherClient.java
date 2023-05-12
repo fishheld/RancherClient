@@ -1,9 +1,12 @@
+import Utils.BeanHelper;
 import Utils.HttpHelper;
 import Utils.LabelCoder;
 import models.Cluster;
+import models.Deployment;
 import models.Node;
 import models.Pod;
 import org.json.*;
+import services.Scheduler;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -199,8 +202,26 @@ public class RancherClient {
         return true;
     }
 
-    boolean deployPod(Pod pod) {
+    boolean deployDeploment(Deployment d) {
+        //为d的每个Pod Bind节点
+        Scheduler s = new Scheduler();
+        for (Pod pod : d.containers) {
+            s.schedulePod(pod, this.clusterList);
+        }
+        //生成Json文件
+        JSONObject json = BeanHelper.fromDeploymentToJson(d);
 
-
-    }
+        //调用接口发送Json文件进行部署
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Authorization", "Bearer "+accessKey+":"+secretKey);
+        properties.put("Content-Type", "application/json");
+        //连接
+        conn = HttpHelper.connect(apiEndpoint, "/v3/workload/");
+        //请求
+        HttpHelper.request(conn, "POST", null, json.toString());
+        //回应
+        String response = HttpHelper.getResponse(conn);
+        System.out.println(response);
+        return true;
+    };
 }
