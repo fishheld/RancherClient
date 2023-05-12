@@ -2,8 +2,8 @@ import Utils.HttpHelper;
 import Utils.LabelCoder;
 import models.Cluster;
 import models.Node;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import models.Pod;
+import org.json.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -42,7 +42,7 @@ public class RancherClient {
         conn = HttpHelper.connect(apiEndpoint, "/v3/nodes");
         Map<String, String> property = new HashMap<>();
         property.put("Authorization", "Bearer "+accessKey+":"+secretKey);
-        HttpHelper.request(conn, "GET", property);
+        HttpHelper.request(conn, "GET", property, "");
         String response = HttpHelper.getResponse(conn);
         //处理响应数据(JSON)
         try {
@@ -110,7 +110,7 @@ public class RancherClient {
         conn = HttpHelper.connect(apiEndpoint, "/v3/clusters");
         Map<String, String> property = new HashMap<>();
         property.put("Authorization", "Bearer "+accessKey+":"+secretKey);
-        HttpHelper.request(conn, "GET", property);
+        HttpHelper.request(conn, "GET", property, "");
         String response = HttpHelper.getResponse(conn);
 
         //处理响应数据(JSON)
@@ -197,5 +197,10 @@ public class RancherClient {
             e.labelCode = tmp;
         }
         return true;
+    }
+
+    boolean deployPod(Pod pod) {
+
+
     }
 }

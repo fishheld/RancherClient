@@ -45,7 +45,7 @@ public class HttpHelper {
      * @param properties
      * @return
      */
-    public static boolean request(HttpURLConnection conn, String method, Map<String, String> properties) {
+    public static boolean request(HttpURLConnection conn, String method, Map<String, String> properties, String body) {
         try {
             //设置请求方法
             conn.setRequestMethod(method);
@@ -53,6 +53,9 @@ public class HttpHelper {
             for (String e : properties.keySet()) {
                 conn.setRequestProperty(e, properties.get(e));
             }
+            //设置请求体
+            conn.getOutputStream().write(body.getBytes());
+            //发送请求
             int responseCode = conn.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 System.out.println("http请求失误");
@@ -88,5 +91,4 @@ public class HttpHelper {
         return response.toString();
     }
 
-    //写入请求内容
 }
