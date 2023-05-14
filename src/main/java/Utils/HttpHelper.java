@@ -2,6 +2,7 @@ package Utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -49,18 +50,24 @@ public class HttpHelper {
         try {
             //设置请求方法
             conn.setRequestMethod(method);
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
             //设置请求属性
             for (String e : properties.keySet()) {
                 conn.setRequestProperty(e, properties.get(e));
             }
             //设置请求体
-            conn.getOutputStream().write(body.getBytes());
-            //发送请求
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+            writer.write(body);
+            writer.flush();
+            writer.close();
+
+//            conn.connect();
+            //发送请求,并返回响应代码
             int responseCode = conn.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                System.out.println("http请求失误");
+            if (responseCode >= 400) {
                 // 处理错误响应
-                System.out.println("Error response: " + responseCode + " in connect()");
+                System.out.println("Http请求失误 code:" + responseCode + " in HttpHelper.request()");
             } else {
                 return true;
             }

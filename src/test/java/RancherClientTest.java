@@ -1,3 +1,4 @@
+import Utils.HttpHelper;
 import models.Cluster;
 import models.Node;
 import org.junit.Test;
@@ -43,5 +44,11 @@ public class RancherClientTest {
             System.out.print(e.nodeName);
             System.out.println(" " + e.labelCode);
         }
+    }
+
+    @Test
+    public void deployTest() {
+        RancherClient c = new RancherClient();
+//        c.deployTest();
     }
 }

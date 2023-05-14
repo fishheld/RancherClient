@@ -204,6 +204,7 @@ public class RancherClient {
 
     boolean deployDeploment(Deployment d) {
         //为d的每个Pod Bind节点
+        //同一个Deployment中的Pod只能在同一个集群中
         Scheduler s = new Scheduler();
         for (Pod pod : d.containers) {
             s.schedulePod(pod, this.clusterList);
@@ -216,12 +217,44 @@ public class RancherClient {
         properties.put("Authorization", "Bearer "+accessKey+":"+secretKey);
         properties.put("Content-Type", "application/json");
         //连接
-        conn = HttpHelper.connect(apiEndpoint, "/v3/workload/");
+        conn = HttpHelper.connect(apiEndpoint, "/v3/projects/c-m-5psjpjzh:p-klqjt/deployments");
         //请求
-        HttpHelper.request(conn, "POST", null, json.toString());
+        HttpHelper.request(conn, "POST", properties, json.toString());
         //回应
         String response = HttpHelper.getResponse(conn);
         System.out.println(response);
         return true;
+    };
+
+    void deployTest() {
+        JSONObject body = new JSONObject();
+        try {
+            body.put("name", "test-from-client");
+            body.put("namespaceId", "default");
+            JSONObject nginx = new JSONObject();
+            nginx.put("name", "nginx-from-client");
+            nginx.put("image", "nginx:latest");
+            JSONArray containers = new JSONArray();
+            containers.put(nginx);
+            body.put("containers", containers);
+            //调用接口发送Json文件进行部署
+            Map<String, String> properties = new HashMap<>();
+            properties.put("Authorization", "Bearer "+accessKey+":"+secretKey);
+            properties.put("Content-Type", "application/json");
+            //连接
+            conn = HttpHelper.connect(apiEndpoint, "/v3/projects/c-m-5psjpjzh:p-klqjt/deployments");
+            //请求
+            System.out.println(body.toString());
+            HttpHelper.request(conn, "POST", properties, body.toString());
+            //回应
+            String response = HttpHelper.getResponse(conn);
+            System.out.println(response);
+            //
+            HttpHelper.disConnect(conn);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     };
 }
