@@ -6,12 +6,10 @@ import models.Deployment;
 import models.Node;
 import models.Pod;
 import org.json.*;
+import services.Operations;
 import services.Scheduler;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 public class RancherClient {
@@ -41,13 +39,9 @@ public class RancherClient {
      */
     boolean updateNodes() {
         nodeList = new ArrayList<>();
-        //创建连接
-        conn = HttpHelper.connect(apiEndpoint, "/v3/nodes");
-        Map<String, String> property = new HashMap<>();
-        property.put("Authorization", "Bearer "+accessKey+":"+secretKey);
-        HttpHelper.request(conn, "GET", property, "");
-        String response = HttpHelper.getResponse(conn);
-        //处理响应数据(JSON)
+        //
+        String response = new Operations(accessKey+":"+secretKey).query("/v3/nodes");
+        //按照Node类型处理响应数据(JSON)
         try {
             JSONObject json = new JSONObject(response);
             //获取node的json对象数组
@@ -108,15 +102,9 @@ public class RancherClient {
      */
     boolean updateClusters() {
         clusterList = new ArrayList<Cluster>();
-
-        //创建连接
-        conn = HttpHelper.connect(apiEndpoint, "/v3/clusters");
-        Map<String, String> property = new HashMap<>();
-        property.put("Authorization", "Bearer "+accessKey+":"+secretKey);
-        HttpHelper.request(conn, "GET", property, "");
-        String response = HttpHelper.getResponse(conn);
-
-        //处理响应数据(JSON)
+        //
+        String response = new Operations(accessKey+":"+secretKey).query("/v3/clusters");
+        //按照Cluster类型处理响应数据(JSON)
         try {
             JSONObject json = new JSONObject(response);
             //获取cluster的json对象数组
@@ -212,18 +200,10 @@ public class RancherClient {
         //生成Json文件
         JSONObject json = BeanHelper.fromDeploymentToJson(d);
 
-        //调用接口发送Json文件进行部署
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Authorization", "Bearer "+accessKey+":"+secretKey);
-        properties.put("Content-Type", "application/json");
-        //连接
-        conn = HttpHelper.connect(apiEndpoint, "/v3/projects/c-m-5psjpjzh:p-klqjt/deployments");
-        //请求
-        HttpHelper.request(conn, "POST", properties, json.toString());
-        //回应
-        String response = HttpHelper.getResponse(conn);
-        System.out.println(response);
-        return true;
+        //拼凑url
+        String url = "/v3/projects/c-m-5psjpjzh:p-klqjt/deployments";
+
+        return new Operations(accessKey+":"+secretKey).create(url, json.toString());
     };
 
     void deployTest() {
@@ -237,20 +217,9 @@ public class RancherClient {
             JSONArray containers = new JSONArray();
             containers.put(nginx);
             body.put("containers", containers);
-            //调用接口发送Json文件进行部署
-            Map<String, String> properties = new HashMap<>();
-            properties.put("Authorization", "Bearer "+accessKey+":"+secretKey);
-            properties.put("Content-Type", "application/json");
-            //连接
-            conn = HttpHelper.connect(apiEndpoint, "/v3/projects/c-m-5psjpjzh:p-klqjt/deployments");
-            //请求
-            System.out.println(body.toString());
-            HttpHelper.request(conn, "POST", properties, body.toString());
-            //回应
-            String response = HttpHelper.getResponse(conn);
-            System.out.println(response);
             //
-            HttpHelper.disConnect(conn);
+            String url = "/v3/projects/c-m-5psjpjzh:p-klqjt/deployments";
+            new Operations(accessKey+":"+secretKey).create(url, body.toString());
 
         } catch (Exception e) {
             e.printStackTrace();

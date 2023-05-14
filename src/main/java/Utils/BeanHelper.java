@@ -32,14 +32,14 @@ public class BeanHelper {
     public static JSONObject fromDeploymentToJson(Deployment d) {
         JSONObject res = new JSONObject();
         try {
-            //
+            //Deployment 的其他属性
             res.put("name", d.name);
             res.put("namespaceId", d.namespaceId);
             res.put("projectId", d.projectId);
-            //
+            //Deployment 的容器列表
             JSONArray containers = new JSONArray();
             for (Pod p : d.containers) {
-
+                containers.put(BeanHelper.fromPodToJson(p));
             }
         } catch (JSONException e) {
             e.printStackTrace();

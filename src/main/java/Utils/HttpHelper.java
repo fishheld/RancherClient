@@ -39,13 +39,7 @@ public class HttpHelper {
         return true;
     }
 
-    /**
-     * 发送请求
-     * @param conn
-     * @param method
-     * @param properties
-     * @return
-     */
+    /*
     public static boolean request(HttpURLConnection conn, String method, Map<String, String> properties, String body) {
         try {
             //设置请求方法
@@ -76,13 +70,14 @@ public class HttpHelper {
         }
         return false;
     }
+    */
 
     /**
      * 读取响应内容.
      * @param conn
      * @return 响应内容的String。
      */
-    public static String getResponse(HttpURLConnection conn) {
+    public static String getResponseString(HttpURLConnection conn) {
         //读取响应数据
         StringBuffer response = new StringBuffer();
         try {
@@ -98,4 +93,53 @@ public class HttpHelper {
         return response.toString();
     }
 
+    public static HttpURLConnection doPost(HttpURLConnection conn, Map<String, String> properties, String body){
+        try {
+            //设置请求方法
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            //设置请求属性
+            for (String e : properties.keySet()) {
+                conn.setRequestProperty(e, properties.get(e));
+            }
+            //设置请求体
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+            writer.write(body);
+            writer.flush();
+            writer.close();
+
+            //发送请求,并返回响应代码
+            int responseCode = conn.getResponseCode();
+            if (responseCode >= 400) {
+                // 处理错误响应
+                System.out.println("Http请求失误 code:" + responseCode + " in HttpHelper.doPost()");
+            }
+            return conn;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static HttpURLConnection doGet(HttpURLConnection conn, Map<String, String> properties) {
+        try {
+            //设置请求方法
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            //设置请求属性
+            for (String e : properties.keySet()) {
+                conn.setRequestProperty(e, properties.get(e));
+            }
+//            conn.connect();
+            //发送请求,并返回响应代码
+            int responseCode = conn.getResponseCode();
+            if (responseCode >= 400) {
+                // 处理错误响应
+                System.out.println("Http请求失误 code:" + responseCode + " in HttpHelper.doGet()");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conn;
+    }
 }
